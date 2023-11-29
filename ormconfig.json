@@ -5,6 +5,7 @@
   "username": "postgres",
   "password": "docker",
   "database": "node_typescript",
+  "entities": ["./src/**/typeorm/entities/*.ts"],
   "migrations": [
     "./src/shared/typeorm/migrations/*.ts"
   ],
