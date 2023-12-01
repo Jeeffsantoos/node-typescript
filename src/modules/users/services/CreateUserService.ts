@@ -1,5 +1,5 @@
 import { getCustomRepository } from 'typeorm';
-import { UserRepository } from '../typeorm/repositories/UsersRepository';
+import { UsersRepository } from '../typeorm/repositories/UsersRepository';
 import AppError from '@shared/http/errors/AppError';
 import User from '../typeorm/entities/User';
 
@@ -11,7 +11,7 @@ interface IRequest {
 
 class CreateUserService {
   public async execute({ email, name, password }: IRequest): Promise<User> {
-    const usersRepository = getCustomRepository(UserRepository);
+    const usersRepository = getCustomRepository(UsersRepository);
     const emailExists = await usersRepository.findByEmail(email);
 
     if (emailExists) {
