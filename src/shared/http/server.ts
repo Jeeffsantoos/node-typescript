@@ -3,7 +3,7 @@ import 'express-async-errors';
 import express, { NextFunction, Request, Response } from 'express';
 import cors from 'cors';
 import routes from './routes';
-import AppError from '@shared/http/errors/AppError';
+import AppError from '@shared/errors/AppError';
 import '@shared/typeorm';
 import { errors } from 'celebrate';
 const app = express();
@@ -14,6 +14,7 @@ app.use(routes);
 app.use(errors());
 
 app.use(
+  // eslint-disable-next-line no-unused-vars
   (error: Error, request: Request, response: Response, next: NextFunction) => {
     if (error instanceof AppError) {
       return response.status(error.statusCode).json({
