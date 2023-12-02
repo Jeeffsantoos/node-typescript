@@ -1,7 +1,7 @@
 import { getCustomRepository } from 'typeorm';
 import { UsersRepository } from '../typeorm/repositories/UsersRepository';
 import User from '../typeorm/entities/User';
-import AppError from '@shared/http/errors/AppError';
+import AppError from '@shared/errors/AppError';
 
 class ListUserService {
   public async execute(): Promise<User[]> {
