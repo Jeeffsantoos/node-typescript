@@ -17,6 +17,8 @@ interface IResponse {
 
 class CreateSessionService {
   public async execute({ email, password }: IRequest): Promise<IResponse> {
+    const secretKey: string | undefined = authConfig.jwt.secret;
+
     const usersRepository = getCustomRepository(UsersRepository);
     const user = await usersRepository.findByEmail(email);
 
@@ -30,7 +32,11 @@ class CreateSessionService {
       throw new AppError('Incorrect email/password', 401);
     }
 
-    const token = sign({}, authConfig.jwt.secret, {
+    if (!secretKey) {
+      throw new Error('JWT secret is undefined in authConfig');
+    }
+
+    const token = sign({}, secretKey, {
       subject: user.id,
       expiresIn: authConfig.jwt.expiresIn,
     });

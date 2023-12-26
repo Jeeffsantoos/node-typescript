@@ -2,10 +2,9 @@ import { getCustomRepository } from 'typeorm';
 import { UsersRepository } from '../typeorm/repositories/UsersRepository';
 import AppError from '@shared/errors/AppError';
 import User from '../typeorm/entities/User';
-import path from 'path';
+import DiskStorageProvider from '@shared/providers/StorageProvider/DiskStorageProvider';
 import uploadConfig from '@config/upload';
-import fs from 'fs';
-
+import S3StorageProvider from '@shared/providers/StorageProvider/S3StorageProvider';
 interface IRequest {
   userId: string;
   avatarFilename: string | undefined;
@@ -16,29 +15,33 @@ class UpdateUserAvatarService {
     const usersRepository = getCustomRepository(UsersRepository);
 
     const user = await usersRepository.findById(userId);
-
     if (!user) {
       throw new AppError('User not found');
     }
-
     if (!avatarFilename) {
       throw new AppError('Avatar not found');
     }
 
-    if (user.avatar) {
-      const userAvatarFilePath = path.join(uploadConfig.directory, user.avatar);
-      const userAvatarFileExists = await fs.promises.stat(userAvatarFilePath);
-
-      if (userAvatarFileExists) {
-        await fs.promises.unlink(userAvatarFilePath);
+    if (uploadConfig.driver === 's3') {
+      const storageProvider = new S3StorageProvider();
+      if (user.avatar) {
+        await storageProvider.deleteFile(user.avatar);
       }
+      const filename = await storageProvider.saveFile(avatarFilename);
+      user.avatar = filename;
+
+      return user;
+    } else {
+      const storageProvider = new DiskStorageProvider();
+      if (user.avatar) {
+        await storageProvider.deleteFile(user.avatar);
+      }
+      const filename = await storageProvider.saveFile(avatarFilename);
+      user.avatar = filename;
+      await usersRepository.save(user);
+
+      return user;
     }
-
-    user.avatar = avatarFilename;
-
-    await usersRepository.save(user);
-
-    return user;
   }
 }
 
