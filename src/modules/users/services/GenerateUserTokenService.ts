@@ -1,6 +1,6 @@
 import { getCustomRepository } from 'typeorm';
-import { UserTokensRepository } from '../typeorm/repositories/UserTokensRepository';
-import UserToken from '../typeorm/entities/UserToken';
+import { UserTokensRepository } from '../infra/typeorm/repositories/UserTokensRepository';
+import UserToken from '../infra/typeorm/entities/UserToken';
 
 interface IRequest {
   user_id: string;

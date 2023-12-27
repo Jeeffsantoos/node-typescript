@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import CreateSessionService from '../services/CreateSessionService';
+import CreateSessionService from '../../../services/CreateSessionService';
 import { instanceToInstance } from 'class-transformer';
 
 export default class SessionsController {

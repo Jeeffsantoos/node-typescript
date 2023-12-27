@@ -1,7 +1,7 @@
 import { getCustomRepository } from 'typeorm';
-import { UsersRepository } from '../typeorm/repositories/UsersRepository';
+import { UsersRepository } from '../infra/typeorm/repositories/UsersRepository';
 import AppError from '@shared/errors/AppError';
-import User from '../typeorm/entities/User';
+import User from '../infra/typeorm/entities/User';
 import DiskStorageProvider from '@shared/providers/StorageProvider/DiskStorageProvider';
 import uploadConfig from '@config/upload';
 import S3StorageProvider from '@shared/providers/StorageProvider/S3StorageProvider';
