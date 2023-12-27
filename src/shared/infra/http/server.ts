@@ -5,11 +5,11 @@ import express, { NextFunction, Request, Response } from 'express';
 import cors from 'cors';
 import routes from './routes';
 import AppError from '@shared/errors/AppError';
-import '@shared/typeorm';
+import '@shared/infra/typeorm';
 import uploadConfig from '@config/upload';
 import { errors } from 'celebrate';
 import { pagination } from 'typeorm-pagination';
-import rateLimiter from '@shared/http/middlewares/rateLimiter';
+import rateLimiter from '@shared/infra/http/middlewares/rateLimiter';
 
 const app = express();
 

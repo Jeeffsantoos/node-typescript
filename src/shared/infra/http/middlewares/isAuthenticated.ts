@@ -15,6 +15,7 @@ export default function isAuthenticated(
   response: Response,
   next: NextFunction,
 ): void {
+  const secretKey: string | undefined = authConfig.jwt.secret;
   const authHeader = request.headers.authorization;
 
   if (!authHeader) {
@@ -23,8 +24,12 @@ export default function isAuthenticated(
 
   const [type, token] = authHeader.split(' ');
 
+  if (!secretKey) {
+    throw new Error('JWT secret is undefined in authConfig');
+  }
+
   try {
-    const decodedToken = verify(token, authConfig.jwt.secret);
+    const decodedToken = verify(token, secretKey);
 
     const { sub } = decodedToken as ITokenPayload;
 

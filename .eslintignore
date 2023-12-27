@@ -2,3 +2,4 @@ node_modules
 dist
 /build
 /*.js
+babel.config.js

@@ -1,7 +1,7 @@
 import { getCustomRepository } from 'typeorm';
 import { OrdersRepository } from '../typeorm/repositories/OrderRepository';
 import Order from '../typeorm/entities/Order';
-import { CustomersRepository } from '@modules/customers/typeorm/repositories/CustomersRepository';
+import { CustomersRepository } from '@modules/customers/infra/typeorm/repositories/CustomersRepository';
 import { ProductRepository } from '@modules/products/typeorm/repositories/ProductsRepository';
 import AppError from '@shared/errors/AppError';
 
