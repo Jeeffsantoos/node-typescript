@@ -1,22 +1,23 @@
-import { getCustomRepository } from 'typeorm';
-import { CustomersRepository } from '../infra/typeorm/repositories/CustomersRepository';
+/* eslint-disable no-unused-vars */
 import AppError from '@shared/errors/AppError';
+import { IDeleteCustomer } from '../domain/models/IDeleteCustomer';
+import { inject, injectable } from 'tsyringe';
+import { ICustomersRepository } from '../domain/repositories/ICustomersRepository';
 
-interface IRequest {
-  id: string;
-}
-
+@injectable()
 class DeleteCustomerService {
-  public async execute({ id }: IRequest): Promise<void> {
-    const customersRepository = getCustomRepository(CustomersRepository);
-
-    const customer = await customersRepository.findById(id);
+  constructor(
+    @inject('CustomersRepository')
+    private customersRepository: ICustomersRepository,
+  ) {}
+  public async execute({ id }: IDeleteCustomer): Promise<void> {
+    const customer = await this.customersRepository.findById(id);
 
     if (!customer) {
       throw new AppError('There is no customer.');
     }
 
-    await customersRepository.remove(customer);
+    await this.customersRepository.remove(customer);
   }
 }
 

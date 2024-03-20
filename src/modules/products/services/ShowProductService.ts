@@ -1,17 +1,18 @@
-import { getCustomRepository } from 'typeorm';
-import { ProductRepository } from '../infra/typeorm/repositories/ProductsRepository';
+/* eslint-disable no-unused-vars */
 import Product from '../infra/typeorm/entities/Product';
 import AppError from '@shared/errors/AppError';
+import { IShowCustomer } from '@modules/customers/domain/models/IShowCustomer';
+import { inject, injectable } from 'tsyringe';
+import { IProductsRepository } from '../domain/repositories/IProductRepository';
 
-interface IRequest {
-  id: string;
-}
-
+@injectable()
 class ShowProductService {
-  public async execute({ id }: IRequest): Promise<Product> {
-    const ProductsRepository = getCustomRepository(ProductRepository);
-
-    const product = await ProductsRepository.findOne(id);
+  constructor(
+    @inject('ProductsRepository')
+    private productsRepository: IProductsRepository,
+  ) {}
+  public async execute({ id }: IShowCustomer): Promise<Product> {
+    const product = await this.productsRepository.findById(id);
 
     if (!product) {
       throw new AppError('Product not found.');

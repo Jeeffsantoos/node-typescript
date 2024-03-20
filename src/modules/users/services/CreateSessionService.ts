@@ -1,42 +1,41 @@
-import { getCustomRepository } from 'typeorm';
-import { UsersRepository } from '../infra/typeorm/repositories/UsersRepository';
+/* eslint-disable no-unused-vars */
 import AppError from '@shared/errors/AppError';
-import User from '../infra/typeorm/entities/User';
-import { compare } from 'bcryptjs';
-import { sign } from 'jsonwebtoken';
+import { sign, Secret } from 'jsonwebtoken';
 import authConfig from '@config/auth';
-interface IRequest {
-  email: string;
-  password: string;
-}
+import { ICreateSession } from '../domain/models/ICreateSession';
+import { IUserAuthenticated } from '../domain/models/IUserAuthenticated';
+import { inject, injectable } from 'tsyringe';
+import { IUsersRepository } from '../domain/repositories/IUserRepository';
+import { IHashProvider } from '../providers/HashProvider/models/IHashProvider';
 
-interface IResponse {
-  user: User;
-  token: string;
-}
-
+@injectable()
 class CreateSessionService {
-  public async execute({ email, password }: IRequest): Promise<IResponse> {
-    const secretKey: string | undefined = authConfig.jwt.secret;
-
-    const usersRepository = getCustomRepository(UsersRepository);
-    const user = await usersRepository.findByEmail(email);
+  constructor(
+    @inject('UsersRepository')
+    private userRespository: IUsersRepository,
+    @inject('HashProvider')
+    private hashProvider: IHashProvider,
+  ) {}
+  public async execute({
+    email,
+    password,
+  }: ICreateSession): Promise<IUserAuthenticated> {
+    const user = await this.userRespository.findByEmail(email);
 
     if (!user) {
       throw new AppError('Incorrect email/password', 401);
     }
 
-    const passwordConfirmed = await compare(password, user.password);
+    const passwordConfirmed = await this.hashProvider.compareHash(
+      password,
+      user.password,
+    );
 
     if (!passwordConfirmed) {
       throw new AppError('Incorrect email/password', 401);
     }
 
-    if (!secretKey) {
-      throw new Error('JWT secret is undefined in authConfig');
-    }
-
-    const token = sign({}, secretKey, {
+    const token = sign({}, authConfig.jwt.secret as Secret, {
       subject: user.id,
       expiresIn: authConfig.jwt.expiresIn,
     });

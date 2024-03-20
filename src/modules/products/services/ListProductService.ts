@@ -1,26 +1,31 @@
-import { getCustomRepository } from 'typeorm';
-import { ProductRepository } from '../infra/typeorm/repositories/ProductsRepository';
-import redisCache from '@shared/cache/RedisCache';
-import Product from '../infra/typeorm/entities/Product';
-import AppError from '@shared/errors/AppError';
+/* eslint-disable no-unused-vars */
+import { inject, injectable } from 'tsyringe';
+import { IProductsRepository } from '../domain/repositories/IProductRepository';
+import { IProductPaginate } from '../domain/models/IPaginateProduct';
 
+interface SearchParams {
+  page: number;
+  limit: number;
+}
+
+@injectable()
 class ListProductService {
-  public async execute(): Promise<Product[]> {
-    const ProductsRepository = getCustomRepository(ProductRepository);
-    // const redisCache = new RedisCache();
+  constructor(
+    @inject('ProductsRepository')
+    private productsRepository: IProductsRepository,
+  ) {}
 
-    let products = await redisCache.recover<Product[]>(
-      'api-vendas-PRODUCT_LIST',
-    );
-
-    if (!products) {
-      products = await ProductsRepository.find();
-      await redisCache.save('api-vendas-PRODUCT_LIST', products);
-    }
-
-    if (!products) {
-      throw new AppError('There is no product.');
-    }
+  public async execute({
+    page,
+    limit,
+  }: SearchParams): Promise<IProductPaginate> {
+    const take = limit;
+    const skip = (Number(page) - 1) * take;
+    const products = await this.productsRepository.findAll({
+      page,
+      skip,
+      take,
+    });
 
     return products;
   }

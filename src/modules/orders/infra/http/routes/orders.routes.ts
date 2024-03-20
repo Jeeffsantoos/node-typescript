@@ -5,7 +5,7 @@ import { celebrate, Joi, Segments } from 'celebrate';
 const ordersRouter = Router();
 const ordersController = new OrdersController();
 
-ordersRouter.get('/', ordersController.show);
+ordersRouter.get('/', ordersController.index);
 
 ordersRouter.get(
   '/:id',

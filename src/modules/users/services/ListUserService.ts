@@ -1,19 +1,30 @@
-import { getCustomRepository } from 'typeorm';
-import { UsersRepository } from '../infra/typeorm/repositories/UsersRepository';
-import User from '../infra/typeorm/entities/User';
-import AppError from '@shared/errors/AppError';
+/* eslint-disable no-unused-vars */
+import { inject, injectable } from 'tsyringe';
+import { IPaginateUser } from '../domain/models/IPaginateUser';
+import { IUsersRepository } from '../domain/repositories/IUserRepository';
 
+interface SearchParams {
+  page: number;
+  limit: number;
+}
+
+@injectable()
 class ListUserService {
-  public async execute(): Promise<User[]> {
-    const usersRepository = getCustomRepository(UsersRepository);
+  constructor(
+    @inject('UsersRepository')
+    private usersRepository: IUsersRepository,
+  ) {}
 
-    const user = await usersRepository.find();
+  public async execute({ page, limit }: SearchParams): Promise<IPaginateUser> {
+    const take = limit;
+    const skip = (Number(page) - 1) * take;
+    const users = await this.usersRepository.findAll({
+      page,
+      skip,
+      take,
+    });
 
-    if (!user) {
-      throw new AppError('There is no user.');
-    }
-
-    return user;
+    return users;
   }
 }
 
