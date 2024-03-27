@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import AppError from '@shared/errors/AppError';
 import Product from '../infra/typeorm/entities/Product';
 import redisCache from '@shared/cache/RedisCache';
